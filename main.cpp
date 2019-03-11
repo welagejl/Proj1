@@ -29,8 +29,11 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
-
 using namespace std;
+const int S1 = 10;
+const int S2 = 12;
+const int S3 = 14;
+const int S4 = 20;
 /*
  * Function: Menu
  *
@@ -40,7 +43,8 @@ using namespace std;
  * parameters int x, int y for board size
  * return value: void
  */
-void menu(int& x, int& y){
+int menu(){
+
     char userChoice;
 
     cout << "\t\t Minesweeper" << endl;
@@ -57,29 +61,22 @@ void menu(int& x, int& y){
             cout << "(h)ard" << endl;
             cout << "(S)uper Hard" << endl;
             cin >> userChoice;
-            switch (userChoice){
-                case 'e':
-                    x = 10;
-                    y = 10;
-                    cout << "begin";
-                    break;
-                case 'm':
-                    x = 12;
-                    y = 14;
-                    break;
-                case 'h':
-                    x = 15;
-                    y = 17;
-                    break;
-                case 'S':
-                    x = 20;
-                    y = 20;
-                    break;
-             }
+            if(userChoice == 'e'){
+                return S1;
+            }
+            if(userChoice == 'm'){
+                return S2;
+            }
+            if(userChoice == 'h'){
+                    return S3;
+            }
+            if(userChoice == 'S'){
+                    return S4;
+            }
         break;
         case 'o':
             cout << "There are no options";
-            break;
+            return 1;
         case 'e':
             exit(0);
     }
@@ -93,26 +90,88 @@ void menu(int& x, int& y){
  * parameters: int x, int y for board size
  * return value: int array
  */
-int genBoard(int x, int y){
-    const int xrow = x;
-    const int ycol = y;
-    int board[xrow][ycol];
+void genBoard(const int x, const int y, int board[][S1]){
+
+    int count = 0;
+
     system("cls");
+    cout << "  ";
+    for(int i = 1; i <= y; i++){
+        cout << i;
+        if(i == y){
+            cout << endl;
+        }
+    }
     for(int i = 0; i < x; i++){
+        cout << count << " ";
         for(int j = 0; j < y; j++){
-            board[x][y] = 0;
-            cout << board[xrow][ycol];
+            board[i][j] = 0;
+            cout << board[i][j];
             if( j == y -1){
                 cout << endl;
             }
         }
+        count++;
     }
-    return board[x][y];
+}
+int randspotgen(int boardDim){
+    return (rand() % boardDim) + 1;
+}
+void placeMine(const int x, int board[][S1]){
+    if(x == S1){
+        for(int i = 0; i < 10; i++){
+            board[randspotgen(x)][randspotgen(x)] = 9;
+        }
+    }
+    else if (x == S2) {
+        for(int i = 0; i < 20; i++){
+            board[randspotgen(x)][randspotgen(x)] = 9;
+        }
+    }
+    else if (x == S3) {
+        for(int i = 0; i < 35; i++){
+            board[randspotgen(x)][randspotgen(x)] = 9;
+        }
+    }
+    else if (x == S4) {
+        for(int i = 0; i < 399; i++){
+            board[randspotgen(x)][randspotgen(x)] = 9;
+        }
+    }
+}
+void disp(int board[][S1], int row){
+    system("cls");
+    int count = 0;
+    cout << "  ";
+    for(int i = 1; i <= row; i++){
+        cout << i << " ";
+        if(i == row){
+            cout << endl;
+        }
+    }
+    for(int i = 0; i < row; i++){
+        cout << count << " ";
+        for(int j = 0; j < S1; j++){
+            cout <<" " <<  board[i][j];
+            if(j == S1 - 1){ cout << endl;}
+        }
+        count ++;
+    }
 }
 int main()
 {
-   int xsize, ysize;
-   menu(xsize, ysize);
-   genBoard(xsize,ysize);
+    int choice = menu();
+    if(choice == S1){
+        int board[S1][S1];
+        genBoard(S1,S1, board);
+        placeMine(S1, board);
+        system("pause");
+        disp(board, S1);
+    }
+
+
+
+
+   //genMine(xsize, ysize, genBoard(xsize,ysize));
    return 0;
 }

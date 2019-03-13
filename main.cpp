@@ -117,56 +117,171 @@ void genBoard(const int x, const int y, int board[][S1]){
 int randspotgen(int boardDim){
     return (rand() % boardDim) + 1;
 }
-void placeMine(const int x, int board[][S1]){
-    if(x == S1){
+
+int hide(int board[][S1], int userGuess[2]){
+    if(board[userGuess[0]][userGuess[1]] == 0){
+        return 1;
+    }
+    else if(board[userGuess[0]][userGuess[1]] != 0 || board[userGuess[0]][userGuess[1]] != 9){
+        return 2;
+    }
+    else{
+        return 3;
+    }
+    return 0;
+}
+void addNums(int board[][S1], int xmine, int ymine){
+
+    board[xmine][ymine+1]!= 9 ? board[xmine][ymine+1] += 1: 0;
+    board[xmine+1][ymine]!= 9 ? board[xmine+1][ymine] += 1: 0;
+    board[xmine][ymine-1]!= 9 ? board[xmine][ymine-1] += 1: 0;
+    board[xmine-1][ymine]!= 9 ? board[xmine-1][ymine] += 1: 0;
+    board[xmine+1][ymine+1]!= 9 ? board[xmine+1][ymine+1] += 1: 0;
+    board[xmine-1][ymine-1]!= 9 ? board[xmine-1][ymine-1] += 1: 0;
+    board[xmine-1][ymine+1]!= 9 ? board[xmine-1][ymine+1] += 1: 0;
+    board[xmine+1][ymine-1]!= 9 ? board[xmine+1][ymine-1] += 1: 0;
+}
+/*bool searchNums(int board[][S1], int xmine, int ymine){
+    bool stop[8] = {0,0,0,0,0,0,0,0};
+    int end = 0;
+    int i = 0;
+    while(end == 0){
+        board[xmine][ymine+i] == 0 && stop[0] == 0 ? cout << board[xmine][ymine +i]: stop[0] = 1;
+        board[xmine+i][ymine] == 0 && stop[1] == 0 ? board[xmine+i][ymine] += 0: stop[1] = 1;
+        board[xmine][ymine-i] == 0 && stop[2] == 0 ? board[xmine][ymine-i] += 0: stop[2] = 1;
+        board[xmine-i][ymine] == 0 && stop[3] == 0 ? board[xmine-i][ymine] += 0: stop[3] = 1;
+        board[xmine+i][ymine+i] == 0 && stop[4] == 0 ? board[xmine+i][ymine+i] += 0: stop[4] = 1;
+        board[xmine-i][ymine-i] == 0 && stop[5] == 0 ? board[xmine-i][ymine-i] += 0: stop[5] = 1;
+        board[xmine-i][ymine+i] == 0 && stop[6] == 0 ? board[xmine-i][ymine+i] += 0: stop[6] = 1;
+        board[xmine+i][ymine-i] == 0 && stop[7] == 0 ? board[xmine+i][ymine-i] += 0: stop[7] == 1;
+        if(stop[0] && stop[1] && stop[2] && stop[3] && stop[4] && stop[5] && stop[6] && stop[7]){
+            end = 1;
+        }
+        else{ i += 1; }
+    }
+}
+*/
+void placeMine(int size, int& xmine,int& ymine, int board[][S1]){
+    if(size == S1){
         for(int i = 0; i < 10; i++){
-            board[randspotgen(x)][randspotgen(x)] = 9;
-        }
+            xmine = randspotgen(size);
+            ymine = randspotgen(size);
+            board[xmine][ymine] = 9;
+            addNums(board, xmine, ymine);
+            }
     }
-    else if (x == S2) {
+
+
+    /*else if (size == S2) {
         for(int i = 0; i < 20; i++){
+            //if(hide() != true)
             board[randspotgen(x)][randspotgen(x)] = 9;
         }
     }
-    else if (x == S3) {
+    else if (size == S3) {
         for(int i = 0; i < 35; i++){
             board[randspotgen(x)][randspotgen(x)] = 9;
         }
     }
-    else if (x == S4) {
+    else if (size == S4) {
         for(int i = 0; i < 399; i++){
             board[randspotgen(x)][randspotgen(x)] = 9;
         }
-    }
+    }*/
 }
-void disp(int board[][S1], int row){
+
+bool disp(int board[][S1], int row){
+
+    int playerGuess[2];
+    int count = 1;
+    cout << "Enter coordinate guess x" << endl;
+    cin >> playerGuess[0];
+    playerGuess[0] = playerGuess[0] - 1;
+    cout << "Enter coordinate guess y" << endl;
+    cin >> playerGuess[1];
+    playerGuess[1] = playerGuess[1] - 1;
     system("cls");
-    int count = 0;
-    cout << "  ";
-    for(int i = 1; i <= row; i++){
+    cout << "\t ";
+    for(int i = 1; i <= S1; i++){
         cout << i << " ";
-        if(i == row){
+        if(i == S1){
             cout << endl;
         }
     }
     for(int i = 0; i < row; i++){
-        cout << count << " ";
+        cout << count << "\t";
         for(int j = 0; j < S1; j++){
-            cout <<" " <<  board[i][j];
+            if(i == playerGuess[0] && j == playerGuess[1]){
+                if(hide(board, playerGuess) == 2){
+                    cout <<" " <<  board[i][j];
+                    continue;
+                   }
+                else if(hide(board, playerGuess) == 1){
+                    cout <<" " <<  board[i][j];
+                    continue;
+                   }
+                else if(hide(board, playerGuess) == 3){
+                    cout <<" " <<  board[i][j] << endl;
+                    cout << "You hit a mine";
+                    return 0;
+                }
+            }else{
+                if(board[i][j] == 9){
+                board[i][j] = 0;
+                cout <<" " <<  board[i][j];
+                board[i][j] = 9;
+                }
+               /* else if(board[i][j] != 0){
+                    int temp = board[i][j];
+                    board[i][j]
+                    cout << " " <<  board[i][j];
+                    board[i][j] = temp;
+                }*/
+                else{
+                cout << " " << board[i][j];
+                }
+            }
             if(j == S1 - 1){ cout << endl;}
-        }
+            }
         count ++;
     }
+    cout << board[playerGuess[0]][playerGuess[1]];
+    return 1;
 }
 int main()
 {
+    srand(time(NULL));
+    int xmine, ymine;
+    char continuity;
+    bool processMarker = 0;
     int choice = menu();
     if(choice == S1){
         int board[S1][S1];
         genBoard(S1,S1, board);
-        placeMine(S1, board);
+        placeMine(S1, xmine, ymine, board);
+        cout << "Press x to pause during the game." << endl;
+
         system("pause");
-        disp(board, S1);
+        while(continuity != 'x'){
+            bool game = disp(board, S1);
+
+            if(game == 0){
+                cout <<  "You lost.";
+                exit(0);
+            }
+            else{
+                cout << "c to continue";
+                cin >> continuity;
+            }
+        }
+
+    }
+    if(choice == S2){
+        int board[S2][S1];
+        genBoard(S2,S1, board);
+        placeMine(S2,xmine, ymine, board);
+        system("pause");
+        disp(board, S2);
     }
 
 

@@ -91,11 +91,6 @@ int menu(){
  * return value: int array
  */
 void genBoard(const int x, const int y, int board[][S1]){
-
-    int count = 0;
-
-    system("cls");
-    cout << "  ";
     for(int i = 1; i <= y; i++){
         cout << i;
         if(i == y){
@@ -103,26 +98,20 @@ void genBoard(const int x, const int y, int board[][S1]){
         }
     }
     for(int i = 0; i < x; i++){
-        cout << count << " ";
         for(int j = 0; j < y; j++){
             board[i][j] = 0;
-            cout << board[i][j];
-            if( j == y -1){
-                cout << endl;
-            }
         }
-        count++;
     }
 }
 int randspotgen(int boardDim){
-    return (rand() % boardDim) + 1;
+    return (rand() % 10) + 1;
 }
 
 int hide(int board[][S1], int userGuess[2]){
     if(board[userGuess[0]][userGuess[1]] == 0){
         return 1;
     }
-    else if(board[userGuess[0]][userGuess[1]] != 0 || board[userGuess[0]][userGuess[1]] != 9){
+    else if(board[userGuess[0]][userGuess[1]] != 0 && board[userGuess[0]][userGuess[1]] != 9){
         return 2;
     }
     else{
@@ -130,16 +119,22 @@ int hide(int board[][S1], int userGuess[2]){
     }
     return 0;
 }
-void addNums(int board[][S1], int xmine, int ymine){
+bool checkNums(int row, int xmine, int ymine){
+    if(xmine <= row && ymine <= row){
+        return true;
+    }
+    else{return false;}
+}
+void addNums(int board[][S1], int xmine, int ymine, int row){
 
-    board[xmine][ymine+1]!= 9 ? board[xmine][ymine+1] += 1: 0;
-    board[xmine+1][ymine]!= 9 ? board[xmine+1][ymine] += 1: 0;
-    board[xmine][ymine-1]!= 9 ? board[xmine][ymine-1] += 1: 0;
-    board[xmine-1][ymine]!= 9 ? board[xmine-1][ymine] += 1: 0;
-    board[xmine+1][ymine+1]!= 9 ? board[xmine+1][ymine+1] += 1: 0;
-    board[xmine-1][ymine-1]!= 9 ? board[xmine-1][ymine-1] += 1: 0;
-    board[xmine-1][ymine+1]!= 9 ? board[xmine-1][ymine+1] += 1: 0;
-    board[xmine+1][ymine-1]!= 9 ? board[xmine+1][ymine-1] += 1: 0;
+    board[xmine][ymine+1] != 9 && checkNums(row,xmine ,ymine += 1) ? board[xmine][ymine] += 1: 0;
+    board[xmine+1][ymine]!= 9 && checkNums(row,xmine +=1 ,ymine) ? board[xmine][ymine] += 1: 0;
+    board[xmine][ymine-1]!= 9 && checkNums(row,xmine ,ymine -= 1) ? board[xmine][ymine] += 1: 0;
+    board[xmine-1][ymine]!= 9 && checkNums(row,xmine -= 1 ,ymine) ? board[xmine][ymine] += 1: 0;
+    board[xmine+1][ymine+1]!= 9 && checkNums(row,xmine += 1,ymine += 1)? board[xmine][ymine] += 1: 0;
+    board[xmine-1][ymine-1]!= 9 && checkNums(row,xmine -=1,ymine -= 1)? board[xmine][ymine] += 1: 0;
+    board[xmine-1][ymine+1]!= 9 && checkNums(row,xmine -=1 ,ymine += 1)? board[xmine][ymine] += 1: 0;
+    board[xmine+1][ymine-1]!= 9 && checkNums(row,xmine +=1 ,ymine -=1)? board[xmine][ymine] += 1: 0;
 }
 /*bool searchNums(int board[][S1], int xmine, int ymine){
     bool stop[8] = {0,0,0,0,0,0,0,0};
@@ -167,7 +162,7 @@ void placeMine(int size, int& xmine,int& ymine, int board[][S1]){
             xmine = randspotgen(size);
             ymine = randspotgen(size);
             board[xmine][ymine] = 9;
-            addNums(board, xmine, ymine);
+            addNums(board, xmine, ymine, size);
             }
     }
 
@@ -190,7 +185,7 @@ void placeMine(int size, int& xmine,int& ymine, int board[][S1]){
     }*/
 }
 
-bool disp(int board[][S1], int row){
+bool disp(int board[][S1], int dispBoard[][S1], int row){
 
     int playerGuess[2];
     int count = 1;
@@ -200,8 +195,26 @@ bool disp(int board[][S1], int row){
     cout << "Enter coordinate guess y" << endl;
     cin >> playerGuess[1];
     playerGuess[1] = playerGuess[1] - 1;
-    system("cls");
-    cout << "\t ";
+
+    for(int i = 0; i < row; i++){
+        for(int j = 0; j < S1; j++){
+            if(i == playerGuess[0] && j == playerGuess[1]){
+                if(hide(board, playerGuess) == 2){
+                    dispBoard[i][j] = board[i][j];
+                   }
+                else if(hide(board, playerGuess) == 1){
+                    dispBoard[i][j] = board[i][j];
+                   }
+                else if(hide(board, playerGuess) == 3){
+                   dispBoard[i][j] = board[i][j];
+                }
+
+            }
+
+        }
+
+    }
+    cout << "\t";
     for(int i = 1; i <= S1; i++){
         cout << i << " ";
         if(i == S1){
@@ -211,59 +224,44 @@ bool disp(int board[][S1], int row){
     for(int i = 0; i < row; i++){
         cout << count << "\t";
         for(int j = 0; j < S1; j++){
-            if(i == playerGuess[0] && j == playerGuess[1]){
-                if(hide(board, playerGuess) == 2){
-                    cout <<" " <<  board[i][j];
-                    continue;
-                   }
-                else if(hide(board, playerGuess) == 1){
-                    cout <<" " <<  board[i][j];
-                    continue;
-                   }
-                else if(hide(board, playerGuess) == 3){
-                    cout <<" " <<  board[i][j] << endl;
-                    cout << "You hit a mine";
-                    return 0;
-                }
-            }else{
-                if(board[i][j] == 9){
-                board[i][j] = 0;
-                cout <<" " <<  board[i][j];
-                board[i][j] = 9;
-                }
-               /* else if(board[i][j] != 0){
-                    int temp = board[i][j];
-                    board[i][j]
-                    cout << " " <<  board[i][j];
-                    board[i][j] = temp;
-                }*/
-                else{
-                cout << " " << board[i][j];
-                }
-            }
-            if(j == S1 - 1){ cout << endl;}
-            }
+            cout << dispBoard[i][j] << " ";
+            if(j == S1 -1){cout << endl;}
+        }
         count ++;
-    }
+     }
     cout << board[playerGuess[0]][playerGuess[1]];
     return 1;
 }
 int main()
 {
     srand(time(NULL));
+
     int xmine, ymine;
-    char continuity;
-    bool processMarker = 0;
+    char continuity = 'd';
     int choice = menu();
     if(choice == S1){
         int board[S1][S1];
+        int dispBoard[S1][S1];
+        for(int i = 0; i < S1; i++){
+            for(int j = 0; j < S1; j++){
+                dispBoard[i][j] = 0;
+            }
+        }
         genBoard(S1,S1, board);
         placeMine(S1, xmine, ymine, board);
         cout << "Press x to pause during the game." << endl;
 
         system("pause");
         while(continuity != 'x'){
-            bool game = disp(board, S1);
+            for(int i =0; i < S1; i++){
+                for(int j = 0; j < S1;j++){
+                    cout << board[i][j];
+                    if(j == S1 - 1){cout << endl;}
+
+                }
+            }
+            system("pause");
+            bool game = disp(board,dispBoard, S1);
 
             if(game == 0){
                 cout <<  "You lost.";
@@ -281,7 +279,7 @@ int main()
         genBoard(S2,S1, board);
         placeMine(S2,xmine, ymine, board);
         system("pause");
-        disp(board, S2);
+        //disp(board, S2);
     }
 
 
